@@ -1,6 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-<script>mermaid.initialize({startOnLoad:true});</script>
-
 # Dingo Marketing 系统架构设计
 
 ## 1. 系统概述
@@ -40,8 +37,7 @@ Dingo Marketing 是一个基于 AI Agent 的营销自动化平台，专注于 Gi
 ## 3. 系统架构
 
 ### 3.1 整体架构
-
-<div class="mermaid">
+```
 graph TB
     subgraph "Dingo Marketing System"
         API[API Layer]
@@ -65,7 +61,7 @@ graph TB
     CORE --> CACHE
     CONFIG --> API
     CONFIG --> CORE
-</div>
+```
 
 ### 3.2 核心组件
 
