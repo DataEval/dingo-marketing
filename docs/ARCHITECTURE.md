@@ -204,7 +204,7 @@ crew = Crew(
 
 #### 4.3.1 用户分析协作流程
 
-<div class="mermaid">
+```
 sequenceDiagram
     participant Client
     participant API
@@ -223,7 +223,7 @@ sequenceDiagram
     AI-->>Service: Analysis Result
     Service-->>API: User Profile
     API-->>Client: JSON Response
-</div>
+```
 
 #### 4.3.2 内容营销协作流程
 
@@ -489,7 +489,7 @@ src/
 
 ### 7.1 用户分析流程
 
-<div class="mermaid">
+```
 sequenceDiagram
     participant Client
     participant API
@@ -508,11 +508,11 @@ sequenceDiagram
     AI-->>Service: Analysis Result
     Service-->>API: User Profile
     API-->>Client: JSON Response
-</div>
+```
 
 ### 7.2 内容生成流程
 
-<div class="mermaid">
+```
 sequenceDiagram
     participant Client
     participant API
@@ -528,7 +528,7 @@ sequenceDiagram
     AI-->>Agent: Generated Content
     Agent-->>API: Content Result
     API-->>Client: JSON Response
-</div>
+```
 
 ## 8. API 设计
 
