@@ -18,9 +18,6 @@ class Settings(BaseSettings):
     # 数据库配置
     DATABASE_URL: str = Field(description="数据库连接URL")
     
-    # Redis 配置
-    REDIS_URL: str = Field(default="redis://localhost:6379", description="Redis连接URL")
-    
     # AI 服务配置
     OPENAI_API_KEY: str = Field(description="OpenAI API密钥")
     ANTHROPIC_API_KEY: Optional[str] = Field(default=None, description="Anthropic API密钥")

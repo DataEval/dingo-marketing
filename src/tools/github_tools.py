@@ -7,7 +7,7 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime, timedelta
 
 from crewai.tools import BaseTool
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from github import Github
 from loguru import logger
 
@@ -36,10 +36,13 @@ class GitHubAnalysisTool(BaseTool):
     name: str = "github_analysis"
     description: str = "分析 GitHub 用户、仓库或社区的数据和行为模式"
     args_schema: type[BaseModel] = GitHubAnalysisInput
+    github: Optional[Github] = Field(default=None, exclude=True)
     
-    def __init__(self):
-        super().__init__()
-        self.github = Github(settings.GITHUB_TOKEN)
+    def model_post_init(self, __context: Any) -> None:
+        """初始化 GitHub 客户端"""
+        super().model_post_init(__context)
+        if not self.github:
+            self.github = Github(settings.GITHUB_TOKEN)
     
     def _run(self, username: Optional[str] = None, repository: Optional[str] = None, 
              analysis_type: str = "user", lookback_days: int = 30) -> str:
@@ -287,10 +290,13 @@ class GitHubInteractionTool(BaseTool):
     name: str = "github_interaction"
     description: str = "在 GitHub 上进行互动，如评论、创建 issue 等"
     args_schema: type[BaseModel] = GitHubInteractionInput
+    github: Optional[Github] = Field(default=None, exclude=True)
     
-    def __init__(self):
-        super().__init__()
-        self.github = Github(settings.GITHUB_TOKEN)
+    def model_post_init(self, __context: Any) -> None:
+        """初始化 GitHub 客户端"""
+        super().model_post_init(__context)
+        if not self.github:
+            self.github = Github(settings.GITHUB_TOKEN)
     
     def _run(self, repository: str, interaction_type: str, content: str, 
              target_id: Optional[int] = None) -> str:

@@ -88,7 +88,7 @@ def main():
     try:
         # 启动服务器
         uvicorn.run(
-            "main:app",
+            "src.main:app",
             host=host,
             port=port,
             reload=args.reload or debug,

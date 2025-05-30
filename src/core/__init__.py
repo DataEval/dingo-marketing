@@ -1,6 +1,5 @@
 """
-Core module for Dingo Marketing system.
-Provides base functionality, exceptions, logging, and utilities.
+Core infrastructure modules
 """
 
 from .exceptions import *

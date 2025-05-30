@@ -19,7 +19,7 @@ AI-powered marketing automation platform for GitHub-based projects.
 
 ### 环境要求
 
-- Python 3.9+
+- Python 3.10+ (推荐 3.12)
 - Git
 
 ### 1. 克隆项目
@@ -29,28 +29,55 @@ git clone https://github.com/your-username/dingo-marketing.git
 cd dingo-marketing
 ```
 
-### 2. 初始化环境
+### 2. 安装依赖
 
 ```bash
-# 设置环境和安装依赖
-./deploy.sh setup
+# 使用 pip 安装依赖
+pip install -r requirements.txt
 
-# 配置环境变量
-cp .env.example .env
-# 编辑 .env 文件，填入必要的 API 密钥
+# 或者使用 conda 环境 (推荐)
+conda create -n dingo-marketing python=3.12 -y
+conda activate dingo-marketing
+pip install -r requirements.txt
 ```
 
-### 3. 启动服务
+### 3. 配置环境变量
+
+```bash
+# 复制环境配置文件
+cp .env.example .env
+
+# 编辑 .env 文件，填入必要的 API 密钥
+# 必需配置：
+# - OPENAI_API_KEY: OpenAI API 密钥
+# - GITHUB_TOKEN: GitHub 个人访问令牌
+# - DATABASE_URL: 数据库连接 URL (默认使用 SQLite)
+
+# 可选配置：
+# - REDIS_URL: Redis 连接 URL
+# - TWITTER_API_KEY: Twitter API 密钥 (用于社交媒体功能)
+```
+
+**重要提示**: 
+- 请确保在 `.env` 文件中设置正确的 `OPENAI_API_KEY` 和 `GITHUB_TOKEN`
+- 对于开发环境，使用轻量级的 JSON 文件存储（基于 SQLite 配置自动转换）
+- 系统使用内存缓存，无需安装 Redis
+- 所有依赖都是轻量级的，启动速度快
+
+### 4. 启动服务
 
 ```bash
 # 启动本地服务
-./deploy.sh start
+python run.py
 
-# 或指定端口
-./deploy.sh start -p 8080
+# 开发模式 (自动重载)
+python run.py --debug --reload
+
+# 指定端口和主机
+python run.py --host 0.0.0.0 --port 8080
 ```
 
-### 4. 访问服务
+### 5. 访问服务
 
 - API 服务: http://localhost:8000
 - API 文档: http://localhost:8000/docs
@@ -59,20 +86,23 @@ cp .env.example .env
 ## 🛠️ 管理命令
 
 ```bash
-# 查看服务状态
-./deploy.sh status
+# 查看帮助
+python run.py --help
 
-# 查看日志
-./deploy.sh logs
+# 启动服务 (生产模式)
+python run.py --host 0.0.0.0 --port 8000
 
-# 重启服务
-./deploy.sh restart
+# 启动服务 (开发模式)
+python run.py --debug --reload --log-level debug
+
+# 后台运行
+nohup python run.py --host 0.0.0.0 --port 8000 > logs/app.log 2>&1 &
+
+# 查看进程
+ps aux | grep "python run.py"
 
 # 停止服务
-./deploy.sh stop
-
-# 清理环境
-./deploy.sh clean
+pkill -f "python run.py"
 ```
 
 ## 📖 API 使用示例
@@ -108,18 +138,18 @@ curl -X POST "http://localhost:8000/api/v1/engagement/suggestions" \
 ## 🔧 开发模式
 
 ```bash
-# 激活虚拟环境
-source venv/bin/activate
-
-# 直接运行
+# 开发模式启动 (自动重载)
 python run.py --debug --reload
 
 # 运行测试
 pytest tests/
 
+# 代码格式化
+black src/
+isort src/
+
 # 代码检查
 flake8 src/
-black src/
 ```
 
 ## 📁 项目结构
@@ -137,7 +167,6 @@ dingo-marketing/
 ├── tests/                 # 测试文件
 ├── docs/                  # 文档
 ├── logs/                  # 日志文件
-├── deploy.sh              # 部署脚本
 ├── run.py                 # 应用启动文件
 └── requirements.txt       # Python 依赖
 ```
@@ -158,11 +187,12 @@ OPENAI_API_KEY=your_openai_api_key_here
 GITHUB_TOKEN=your_github_token_here
 GITHUB_REPOSITORY=owner/repo
 
+# 数据存储 (轻量级 JSON 文件)
+DATABASE_URL=sqlite:///./dingo_marketing.db
+
 # 应用配置
-MAX_CONCURRENT_REQUESTS=10
-CACHE_TTL=3600
-DAILY_POST_LIMIT=5
-POST_INTERVAL_HOURS=4
+CAMPAIGN_MAX_DAILY_POSTS=10
+CAMPAIGN_MIN_INTERVAL_MINUTES=60
 ```
 
 ## 🔍 故障排除
@@ -171,36 +201,42 @@ POST_INTERVAL_HOURS=4
 
 1. **端口被占用**
    ```bash
-   ./deploy.sh start -p 8001  # 使用其他端口
+   python run.py --port 8001  # 使用其他端口
    ```
 
 2. **Python 版本过低**
    ```bash
-   python3 --version  # 确保 3.9+
+   python --version  # 确保 3.10+，推荐 3.12
    ```
 
 3. **依赖安装失败**
    ```bash
-   ./deploy.sh clean  # 清理环境
-   ./deploy.sh setup  # 重新初始化
+   pip install --upgrade pip
+   pip install -r requirements.txt
    ```
 
 4. **API 密钥未配置**
    - 检查 `.env` 文件中的 `OPENAI_API_KEY` 和 `GITHUB_TOKEN`
 
+5. **CrewAI 版本冲突**
+   ```bash
+   pip install --upgrade pydantic>=2.8.0
+   pip install crewai==0.121.1
+   ```
+
 ### 查看详细日志
 
 ```bash
-# 实时日志
-./deploy.sh logs
+# 启动时查看日志
+python run.py --debug --log-level debug
 
-# 或直接查看日志文件
+# 后台运行时查看日志
 tail -f logs/app.log
 ```
 
 ## 📊 性能指标
 
-- 启动时间: < 10 秒
+- 启动时间: < 5 秒
 - 内存使用: < 200MB
 - API 响应时间: < 2 秒
 - 并发请求: 支持 10+ 并发
@@ -235,4 +271,4 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ---
 
-**快速开始**: `./deploy.sh setup && ./deploy.sh start` 
+**快速开始**: `pip install -r requirements.txt && python run.py` 

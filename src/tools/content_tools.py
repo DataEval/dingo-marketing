@@ -39,10 +39,13 @@ class ContentGenerationTool(BaseTool):
     name: str = "content_generation"
     description: str = "生成各种类型的营销和技术内容"
     args_schema: type[BaseModel] = ContentGenerationInput
+    openai_client: Optional[AsyncOpenAI] = Field(default=None, exclude=True)
     
-    def __init__(self):
-        super().__init__()
-        self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    def model_post_init(self, __context: Any) -> None:
+        """初始化 OpenAI 客户端"""
+        super().model_post_init(__context)
+        if not self.openai_client:
+            self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
     
     def _run(self, content_type: str, topic: str, target_audience: str, 
              tone: str = "professional", length: str = "medium", 
@@ -200,10 +203,13 @@ class ContentOptimizationTool(BaseTool):
     name: str = "content_optimization"
     description: str = "优化现有内容以提高效果"
     args_schema: type[BaseModel] = ContentOptimizationInput
+    openai_client: Optional[AsyncOpenAI] = Field(default=None, exclude=True)
     
-    def __init__(self):
-        super().__init__()
-        self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    def model_post_init(self, __context: Any) -> None:
+        """初始化 OpenAI 客户端"""
+        super().model_post_init(__context)
+        if not self.openai_client:
+            self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
     
     def _run(self, content: str, optimization_type: str, target_platform: str,
              keywords: Optional[List[str]] = None) -> str:

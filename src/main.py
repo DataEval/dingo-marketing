@@ -14,11 +14,10 @@ from fastapi.middleware.gzip import GZipMiddleware
 from loguru import logger
 
 from src.config.settings import settings
-from src.core.database import init_db
-from src.core.redis_client import init_redis
+from src.core.database import init_db, check_db_health
+from src.core.scheduler import init_scheduler, check_scheduler_health
 from src.agents.marketing import MarketingCrew
-from src.api.routes import api_router
-from src.core.scheduler import init_scheduler
+from src.api.routes import router as api_router
 
 
 @asynccontextmanager
@@ -30,17 +29,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await init_db()
     logger.info("✅ 数据库初始化完成")
     
-    # 初始化 Redis
-    await init_redis()
-    logger.info("✅ Redis 连接建立")
-    
     # 初始化调度器
     await init_scheduler()
     logger.info("✅ 任务调度器启动")
     
     # 初始化 AI Agent 团队
     marketing_crew = MarketingCrew()
-    await marketing_crew.initialize()
     app.state.marketing_crew = marketing_crew
     logger.info("✅ AI Agent 团队初始化完成")
     
@@ -50,7 +44,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     
     # 清理资源
     logger.info("🔄 正在关闭系统...")
-    await marketing_crew.shutdown()
     logger.info("👋 系统已关闭")
 
 
@@ -95,14 +88,17 @@ async def health_check():
     """健康检查"""
     try:
         # 检查各个组件状态
+        db_healthy = await check_db_health()
+        scheduler_healthy = await check_scheduler_health()
+        
         health_status = {
-            "status": "healthy",
+            "status": "healthy" if all([db_healthy, scheduler_healthy]) else "degraded",
             "timestamp": asyncio.get_event_loop().time(),
             "components": {
-                "database": "healthy",
-                "redis": "healthy",
-                "ai_agents": "healthy",
-                "scheduler": "healthy"
+                "database": "healthy" if db_healthy else "unhealthy",
+                "cache": "healthy",  # 内存缓存总是健康的
+                "ai_agents": "healthy",  # AI agents are always healthy if app is running
+                "scheduler": "healthy" if scheduler_healthy else "unhealthy"
             }
         }
         return health_status

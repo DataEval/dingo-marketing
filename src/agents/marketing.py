@@ -105,8 +105,15 @@ class MarketingCrew:
     
     def _create_crew(self) -> Crew:
         """创建团队"""
+        # 在分层流程中，manager agent 不应该包含在 agents 列表中
+        agents_list = [
+            self.agents["data_analyst"],
+            self.agents["content_creator"], 
+            self.agents["community_manager"]
+        ]
+        
         return Crew(
-            agents=list(self.agents.values()),
+            agents=agents_list,
             tasks=[],  # 任务将在执行时动态创建
             process=Process.hierarchical,
             manager_agent=self.agents["marketing_strategist"],

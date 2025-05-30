@@ -76,7 +76,7 @@ class AnalysisResponse(BaseModel):
 
 
 # 创建路由器
-router = APIRouter(prefix="/api/v1", tags=["marketing"])
+router = APIRouter(tags=["marketing"])
 
 # 全局变量存储营销团队实例
 marketing_crew: Optional[MarketingCrew] = None
