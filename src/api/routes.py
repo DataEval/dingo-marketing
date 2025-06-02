@@ -18,6 +18,7 @@ class UserAnalysisRequest(BaseModel):
     """用户分析请求"""
     user_list: List[str] = Field(..., description="GitHub 用户名列表")
     analysis_depth: str = Field(default="standard", description="分析深度: basic, standard, deep")
+    language: str = Field(default="zh", description="分析报告语言: zh (中文), en (English)")
 
 
 class ContentCampaignRequest(BaseModel):
@@ -28,23 +29,27 @@ class ContentCampaignRequest(BaseModel):
     content_types: List[str] = Field(default=["blog", "social"], description="内容类型")
     duration: str = Field(default="1个月", description="活动周期")
     keywords: Optional[List[str]] = Field(default=None, description="关键词列表")
+    language: str = Field(default="zh", description="内容语言: zh (中文), en (English)")
 
 
 class CommunityEngagementRequest(BaseModel):
     """社区互动请求"""
+    repository: str = Field(..., description="目标仓库地址 (格式: owner/repo)")
     interaction_types: List[str] = Field(default=["comment", "issue"], description="互动类型")
     target_count: int = Field(default=10, description="目标用户数量")
+    lookback_days: int = Field(default=30, description="回溯天数")
     engagement_level: str = Field(default="moderate", description="互动强度: light, moderate, intensive")
+    language: str = Field(default="zh", description="互动语言: zh (中文), en (English)")
 
 
 class ComprehensiveCampaignRequest(BaseModel):
     """综合营销活动请求"""
-    name: str = Field(..., description="活动名称")
-    objectives: List[str] = Field(..., description="活动目标")
-    target_audience: str = Field(..., description="目标受众")
-    duration: str = Field(..., description="活动周期")
-    budget_level: str = Field(default="medium", description="预算级别: low, medium, high")
-    priority_channels: List[str] = Field(default=["github", "social"], description="优先渠道")
+    target_users: List[str] = Field(..., description="目标用户列表")
+    target_repositories: List[str] = Field(default=[], description="目标仓库列表")
+    duration: str = Field(default="30天", description="活动周期")
+    budget: str = Field(default="标准", description="预算级别")
+    metrics: List[str] = Field(default=["参与度", "转化率", "知名度"], description="成功指标")
+    language: str = Field(default="zh", description="活动语言: zh (中文), en (English)")
 
 
 class ContentGenerationRequest(BaseModel):
@@ -56,6 +61,27 @@ class ContentGenerationRequest(BaseModel):
     length: str = Field(default="medium", description="长度")
     language: str = Field(default="zh", description="语言")
     keywords: Optional[List[str]] = Field(default=None, description="关键词")
+
+
+class ContentOptimizationRequest(BaseModel):
+    """内容优化请求"""
+    content: str = Field(..., description="原始内容")
+    optimization_type: str = Field(default="general", description="优化类型: seo, engagement, readability, technical")
+    target_platform: str = Field(default="general", description="目标平台: github, twitter, linkedin, blog")
+    keywords: Optional[List[str]] = Field(default=None, description="SEO 关键词")
+
+
+class ContentAnalysisRequest(BaseModel):
+    """内容分析请求"""
+    content: str = Field(..., description="要分析的内容")
+    optimization_type: str = Field(default="general", description="分析类型")
+    target_platform: str = Field(default="general", description="目标平台")
+    keywords: Optional[List[str]] = Field(default=None, description="关键词")
+
+
+class RepositoryConfigRequest(BaseModel):
+    """仓库配置请求"""
+    repository: str = Field(..., description="GitHub 仓库地址 (格式: owner/repo)")
 
 
 # 响应模型
@@ -116,15 +142,16 @@ async def analyze_users(
 ):
     """分析目标用户"""
     try:
-        logger.info(f"开始分析用户: {request.user_list}")
+        logger.info(f"开始分析用户: {request.user_list}, 语言: {request.language}")
         
         # 执行用户分析
-        result = await crew.analyze_target_users(request.user_list)
+        result = await crew.analyze_target_users(request.user_list, request.language)
         
         # 处理分析结果
         analysis_insights = {
             "total_users": len(request.user_list),
             "analysis_depth": request.analysis_depth,
+            "language": request.language,
             "completion_time": datetime.now().isoformat()
         }
         
@@ -134,9 +161,9 @@ async def analyze_users(
             "result": result,
             "insights": analysis_insights,
             "recommendations": [
-                "基于分析结果制定个性化互动策略",
-                "优先关注高影响力和高活跃度用户",
-                "针对不同技术背景的用户调整内容策略"
+                "基于分析结果制定个性化互动策略" if request.language == "zh" else "Develop personalized interaction strategies based on analysis results",
+                "优先关注高影响力和高活跃度用户" if request.language == "zh" else "Prioritize high-influence and high-activity users",
+                "针对不同技术背景的用户调整内容策略" if request.language == "zh" else "Adjust content strategies for users with different technical backgrounds"
             ]
         }
         
@@ -162,7 +189,8 @@ async def create_content_campaign(
             "topics": request.topics,
             "content_types": request.content_types,
             "duration": request.duration,
-            "keywords": request.keywords or []
+            "keywords": request.keywords or [],
+            "language": request.language
         }
         
         # 执行内容营销活动
@@ -186,81 +214,108 @@ async def create_content_campaign(
         raise HTTPException(status_code=500, detail=f"内容营销活动创建失败: {str(e)}")
 
 
-@router.post("/engagement/community", response_model=Dict[str, Any])
-async def execute_community_engagement(
-    request: CommunityEngagementRequest,
-    background_tasks: BackgroundTasks,
-    crew: MarketingCrew = Depends(get_marketing_crew)
-):
-    """执行社区互动"""
+@router.post("/community/engage")
+async def engage_community(request: CommunityEngagementRequest):
+    """执行社区互动活动"""
     try:
-        logger.info("执行社区互动活动")
+        logger.info(f"开始社区互动，目标仓库: {request.repository}, 语言: {request.language}")
         
-        # 构建互动配置
+        # 设置目标仓库
+        crew = get_marketing_crew()
+        crew.set_target_repository(request.repository)
+        
+        # 准备互动配置
         engagement_config = {
+            "repository": request.repository,
             "interaction_types": request.interaction_types,
             "target_count": request.target_count,
-            "engagement_level": request.engagement_level
+            "lookback_days": request.lookback_days,
+            "language": request.language  # 添加语言参数
         }
         
         # 执行社区互动
         result = await crew.execute_community_engagement(engagement_config)
         
+        # 根据语言返回不同的响应
+        if request.language.lower() == "en":
+            insights = "Community engagement activities completed successfully. Check the detailed report for interaction results and community feedback."
+            recommendations = [
+                "Continue monitoring community response to interactions",
+                "Follow up with engaged users for deeper relationships",
+                "Analyze interaction effectiveness for future campaigns"
+            ]
+        else:
+            insights = "社区互动活动已成功完成。请查看详细报告了解互动结果和社区反馈。"
+            recommendations = [
+                "继续监控社区对互动的响应",
+                "跟进已互动的用户以建立更深层次的关系",
+                "分析互动效果以优化未来的活动"
+            ]
+        
         return {
-            "engagement_id": f"community_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            "status": "completed",
-            "result": result,
-            "config": engagement_config,
-            "metrics": {
-                "planned_interactions": request.target_count,
-                "interaction_types": len(request.interaction_types),
-                "engagement_level": request.engagement_level
-            }
+            "status": "success",
+            "task_id": f"community_engagement_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "engagement_result": result,
+            "insights": insights,
+            "recommendations": recommendations
         }
         
     except Exception as e:
-        logger.error(f"社区互动执行失败: {e}")
-        raise HTTPException(status_code=500, detail=f"社区互动执行失败: {str(e)}")
+        logger.error(f"社区互动执行失败: {str(e)}")
+        error_message = f"Community engagement failed: {str(e)}" if request.language.lower() == "en" else f"社区互动执行失败: {str(e)}"
+        raise HTTPException(status_code=500, detail=error_message)
 
 
-@router.post("/campaigns/comprehensive", response_model=Dict[str, Any])
-async def run_comprehensive_campaign(
-    request: ComprehensiveCampaignRequest,
-    background_tasks: BackgroundTasks,
-    crew: MarketingCrew = Depends(get_marketing_crew)
-):
-    """运行综合营销活动"""
+@router.post("/campaigns/comprehensive")
+async def run_comprehensive_campaign(request: ComprehensiveCampaignRequest):
+    """执行综合营销活动"""
     try:
-        logger.info(f"启动综合营销活动: {request.name}")
+        logger.info(f"开始综合营销活动，目标用户: {request.target_users}, 语言: {request.language}")
         
-        # 构建活动配置
+        # 准备活动配置
+        crew = get_marketing_crew()
         campaign_config = {
-            "name": request.name,
-            "objectives": request.objectives,
-            "target_audience": request.target_audience,
+            "target_users": request.target_users,
+            "target_repositories": request.target_repositories,
             "duration": request.duration,
-            "budget_level": request.budget_level,
-            "priority_channels": request.priority_channels
+            "budget": request.budget,
+            "metrics": request.metrics,
+            "language": request.language  # 添加语言参数
         }
         
         # 执行综合营销活动
         result = await crew.run_comprehensive_campaign(campaign_config)
         
+        # 根据语言返回不同的响应
+        if request.language.lower() == "en":
+            insights = "Comprehensive marketing campaign executed successfully. The campaign covered data analysis, content creation, community interaction, and performance evaluation phases."
+            recommendations = [
+                "Monitor campaign performance metrics regularly",
+                "Optimize content based on user engagement data",
+                "Scale successful interaction strategies",
+                "Prepare follow-up campaigns based on results"
+            ]
+        else:
+            insights = "综合营销活动已成功执行。活动涵盖了数据分析、内容创作、社区互动和效果评估等阶段。"
+            recommendations = [
+                "定期监控活动效果指标",
+                "基于用户参与数据优化内容",
+                "扩大成功的互动策略",
+                "基于结果准备后续活动"
+            ]
+        
         return {
-            "campaign_id": f"comprehensive_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            "status": "completed",
-            "result": result,
-            "config": campaign_config,
-            "timeline": {
-                "start_time": datetime.now().isoformat(),
-                "estimated_duration": request.duration,
-                "phases": ["分析", "内容创作", "社区互动", "效果评估"]
-            }
+            "status": "success",
+            "task_id": f"comprehensive_campaign_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "campaign_result": result,
+            "insights": insights,
+            "recommendations": recommendations
         }
         
     except Exception as e:
-        logger.error(f"综合营销活动执行失败: {e}")
-        raise HTTPException(status_code=500, detail=f"综合营销活动执行失败: {str(e)}")
+        logger.error(f"综合营销活动执行失败: {str(e)}")
+        error_message = f"Comprehensive campaign failed: {str(e)}" if request.language.lower() == "en" else f"综合营销活动执行失败: {str(e)}"
+        raise HTTPException(status_code=500, detail=error_message)
 
 
 @router.post("/content/generate", response_model=Dict[str, Any])
@@ -276,6 +331,9 @@ async def generate_content(
         from src.tools.content_tools import ContentGenerationTool
         content_tool = ContentGenerationTool()
         
+        # 将关键词列表转换为字符串
+        keywords_str = ",".join(request.keywords) if request.keywords else ""
+        
         result = content_tool._run(
             content_type=request.content_type,
             topic=request.topic,
@@ -283,7 +341,7 @@ async def generate_content(
             tone=request.tone,
             length=request.length,
             language=request.language,
-            keywords=request.keywords
+            keywords=keywords_str
         )
         
         return {
@@ -302,6 +360,81 @@ async def generate_content(
     except Exception as e:
         logger.error(f"内容生成失败: {e}")
         raise HTTPException(status_code=500, detail=f"内容生成失败: {str(e)}")
+
+
+@router.post("/content/optimize", response_model=Dict[str, Any])
+async def optimize_content(
+    request: ContentOptimizationRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """优化内容"""
+    try:
+        logger.info(f"优化内容: {request.optimization_type} - {request.target_platform}")
+        
+        # 使用内容优化工具
+        from src.tools.content_tools import ContentOptimizationTool
+        optimization_tool = ContentOptimizationTool()
+        
+        # 将关键词列表转换为字符串
+        keywords_str = ",".join(request.keywords) if request.keywords else ""
+        
+        result = optimization_tool._run(
+            content=request.content,
+            optimization_type=request.optimization_type,
+            target_audience="开发者",  # 使用默认值
+            keywords=keywords_str
+        )
+        
+        return {
+            "optimization_id": f"optimize_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed",
+            "optimized_content": result,
+            "metadata": {
+                "optimization_type": request.optimization_type,
+                "target_platform": request.target_platform,
+                "keywords": request.keywords,
+                "optimized_at": datetime.now().isoformat()
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"内容优化失败: {e}")
+        raise HTTPException(status_code=500, detail=f"内容优化失败: {str(e)}")
+
+
+@router.post("/content/analyze", response_model=Dict[str, Any])
+async def analyze_content(
+    request: ContentAnalysisRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """分析内容"""
+    try:
+        logger.info(f"分析内容: {request.optimization_type} - {request.target_platform}")
+        
+        # 使用内容分析工具
+        from src.tools.content_tools import ContentAnalysisTool
+        analysis_tool = ContentAnalysisTool()
+        
+        result = analysis_tool._run(
+            content=request.content,
+            analysis_type=request.optimization_type
+        )
+        
+        return {
+            "analysis_id": f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed",
+            "analysis_result": result,
+            "metadata": {
+                "analysis_type": request.optimization_type,
+                "target_platform": request.target_platform,
+                "keywords": request.keywords,
+                "analyzed_at": datetime.now().isoformat()
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"内容分析失败: {e}")
+        raise HTTPException(status_code=500, detail=f"内容分析失败: {str(e)}")
 
 
 @router.get("/analytics/dashboard")
@@ -425,4 +558,47 @@ async def test_workflow(crew: MarketingCrew = Depends(get_marketing_crew)):
         
     except Exception as e:
         logger.error(f"工作流程测试失败: {e}")
-        raise HTTPException(status_code=500, detail=f"工作流程测试失败: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"工作流程测试失败: {str(e)}")
+
+
+@router.get("/repository")
+async def get_target_repository(crew: MarketingCrew = Depends(get_marketing_crew)):
+    """获取当前目标仓库"""
+    try:
+        repository = crew.get_target_repository()
+        return {
+            "repository": repository,
+            "status": "success",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"获取目标仓库失败: {e}")
+        raise HTTPException(status_code=500, detail=f"获取目标仓库失败: {str(e)}")
+
+
+@router.post("/repository")
+async def set_target_repository(
+    request: RepositoryConfigRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """设置目标仓库"""
+    try:
+        # 验证仓库地址格式
+        if "/" not in request.repository or len(request.repository.split("/")) != 2:
+            raise HTTPException(
+                status_code=400, 
+                detail="仓库地址格式错误，应为 'owner/repo' 格式"
+            )
+        
+        result = crew.set_target_repository(request.repository)
+        
+        return {
+            **result,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"设置目标仓库失败: {e}")
+        raise HTTPException(status_code=500, detail=f"设置目标仓库失败: {str(e)}") 

@@ -49,20 +49,14 @@ cp .env.example .env
 
 # 编辑 .env 文件，填入必要的 API 密钥
 # 必需配置：
-# - OPENAI_API_KEY: OpenAI API 密钥
+# - API_KEY: AI服务API密钥（支持DeepSeek、Qwen、OpenAI等）
 # - GITHUB_TOKEN: GitHub 个人访问令牌
-# - DATABASE_URL: 数据库连接 URL (默认使用 SQLite)
+# - GITHUB_REPOSITORY: 目标GitHub仓库
 
 # 可选配置：
-# - REDIS_URL: Redis 连接 URL
 # - TWITTER_API_KEY: Twitter API 密钥 (用于社交媒体功能)
+# - LINKEDIN_API_KEY: LinkedIn API 密钥 (用于专业社交网络)
 ```
-
-**重要提示**: 
-- 请确保在 `.env` 文件中设置正确的 `OPENAI_API_KEY` 和 `GITHUB_TOKEN`
-- 对于开发环境，使用轻量级的 JSON 文件存储（基于 SQLite 配置自动转换）
-- 系统使用内存缓存，无需安装 Redis
-- 所有依赖都是轻量级的，启动速度快
 
 ### 4. 启动服务
 
@@ -79,9 +73,63 @@ python run.py --host 0.0.0.0 --port 8080
 
 ### 5. 访问服务
 
-- API 服务: http://localhost:8000
-- API 文档: http://localhost:8000/docs
-- 健康检查: http://localhost:8000/health
+- API 服务: http://localhost:8080
+- API 文档: http://localhost:8080/docs
+- 健康检查: http://localhost:8080/api/v1/status
+
+## 🎯 快速演示
+
+我们提供了一个交互式演示脚本，帮助您快速了解系统的主要功能：
+
+### 运行演示脚本
+
+```bash
+# 确保系统正在运行
+python run.py
+
+# 在新终端中运行演示
+python demo_scenarios.py
+```
+
+### 演示场景
+
+#### 1. 用户分析 🔍
+分析GitHub用户的技术背景和社区影响力
+- 支持中英文分析报告
+- 分析编程语言偏好和技术影响力
+- 制定个性化互动策略
+
+**示例用户**: `octocat`, `gvanrossum`, `defunkt`
+
+#### 2. 内容营销活动 📝
+创建针对性的内容营销策略
+- 制定内容日历和发布计划
+- 生成多种类型的营销材料
+- SEO关键词优化
+
+#### 3. 社区互动 🤝
+执行GitHub社区互动活动
+- 分析项目社区状态
+- 识别活跃贡献者
+- 自动化社区互动
+
+#### 4. AI内容生成 ✍️
+使用AI生成高质量内容
+- 支持多种内容格式
+- 中英文内容生成
+- 针对不同受众定制
+
+#### 5. 系统状态监控 🛠️
+检查系统运行状态和配置
+- 系统健康检查
+- 工具状态监控
+- 配置信息查看
+
+#### 6. 综合营销工作流 🎯
+执行完整的营销工作流程
+- 多Agent协作演示
+- 端到端营销流程
+- 效果评估和优化
 
 ## 🛠️ 管理命令
 
@@ -90,67 +138,139 @@ python run.py --host 0.0.0.0 --port 8080
 python run.py --help
 
 # 启动服务 (生产模式)
-python run.py --host 0.0.0.0 --port 8000
+python run.py --host 0.0.0.0 --port 8080
 
 # 启动服务 (开发模式)
 python run.py --debug --reload --log-level debug
 
-# 后台运行
-nohup python run.py --host 0.0.0.0 --port 8000 > logs/app.log 2>&1 &
-
-# 查看进程
-ps aux | grep "python run.py"
-
-# 停止服务
-pkill -f "python run.py"
 ```
 
 ## 📖 API 使用示例
 
-### 分析 GitHub 用户
+### 用户分析
+分析GitHub用户的技术背景和社区影响力：
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/analyze/user" \
-  -H "Content-Type: application/json" \
-  -d '{"username": "octocat"}'
-```
-
-### 生成营销内容
-
-```bash
-curl -X POST "http://localhost:8000/api/v1/content/generate" \
+# 基础分析 (中文)
+curl -X POST "http://localhost:8080/api/v1/analyze/users" \
   -H "Content-Type: application/json" \
   -d '{
-    "type": "social_post",
-    "target_audience": "developers",
-    "product": "your-product"
+    "user_list": ["octocat", "gvanrossum"],
+    "analysis_depth": "basic",
+    "language": "zh"
+  }'
+
+# 深度分析 (英文)
+curl -X POST "http://localhost:8080/api/v1/analyze/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_list": ["defunkt"],
+    "analysis_depth": "deep",
+    "language": "en"
   }'
 ```
 
-### 获取社区互动建议
+### 内容生成
+生成高质量技术内容：
 
 ```bash
-curl -X POST "http://localhost:8000/api/v1/engagement/suggestions" \
+# 生成博客文章
+curl -X POST "http://localhost:8080/api/v1/content/generate" \
   -H "Content-Type: application/json" \
-  -d '{"repository": "owner/repo"}'
+  -d '{
+    "content_type": "blog",
+    "topic": "如何使用Dingo提升数据质量",
+    "target_audience": "数据工程师",
+    "language": "zh",
+    "keywords": ["数据质量", "Python", "自动化"]
+  }'
+
+# 生成社交媒体内容
+curl -X POST "http://localhost:8080/api/v1/content/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content_type": "social",
+    "topic": "Dingo项目新功能发布",
+    "target_audience": "开发者",
+    "language": "en"
+  }'
 ```
 
-## 🔧 开发模式
+### 内容营销活动
+创建针对性的营销策略：
 
 ```bash
-# 开发模式启动 (自动重载)
-python run.py --debug --reload
-
-# 运行测试
-pytest tests/
-
-# 代码格式化
-black src/
-isort src/
-
-# 代码检查
-flake8 src/
+curl -X POST "http://localhost:8080/api/v1/campaigns/content" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Dingo数据质量工具推广",
+    "target_audience": "Python开发者",
+    "topics": ["数据质量", "Python工具", "开源项目"],
+    "content_types": ["blog", "social", "email"],
+    "language": "zh"
+  }'
 ```
+
+### 社区互动
+执行GitHub社区互动活动：
+
+```bash
+curl -X POST "http://localhost:8080/api/v1/community/engage" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "repository": "DataEval/dingo",
+    "interaction_types": ["comment", "issue"],
+    "target_count": 10,
+    "lookback_days": 30,
+    "language": "zh"
+  }'
+```
+
+### 综合营销活动
+执行完整的营销工作流程：
+
+```bash
+curl -X POST "http://localhost:8080/api/v1/campaigns/comprehensive" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_users": ["octocat", "gvanrossum"],
+    "target_repositories": ["DataEval/dingo"],
+    "duration": "30天",
+    "budget": "标准",
+    "metrics": ["参与度", "转化率"],
+    "language": "zh"
+  }'
+```
+
+### 系统状态检查
+```bash
+# 检查系统状态
+curl http://localhost:8080/api/v1/status
+
+# 检查工具状态
+curl http://localhost:8080/api/v1/tools/status
+```
+
+## 💡 使用技巧
+
+### 1. 选择合适的分析深度
+- `basic`: 快速概览，适合初步了解
+- `standard`: 标准分析，平衡速度和详细程度
+- `deep`: 深度分析，提供最全面的洞察
+
+### 2. 语言设置
+- `zh`: 中文报告，适合中文团队
+- `en`: 英文报告，适合国际化项目
+
+### 3. 目标受众定制
+- 明确指定目标受众类型
+- 使用具体的技术栈描述
+- 考虑受众的技术水平
+
+### 4. 关键词优化
+- 使用相关的技术关键词
+- 包含项目特定术语
+- 考虑SEO效果
 
 ## 📁 项目结构
 
@@ -171,76 +291,6 @@ dingo-marketing/
 └── requirements.txt       # Python 依赖
 ```
 
-## ⚙️ 配置说明
-
-主要环境变量 (`.env` 文件):
-
-```bash
-# 基础配置
-DEBUG=true
-HOST=0.0.0.0
-PORT=8000
-LOG_LEVEL=INFO
-
-# AI 服务
-OPENAI_API_KEY=your_openai_api_key_here
-GITHUB_TOKEN=your_github_token_here
-GITHUB_REPOSITORY=owner/repo
-
-# 数据存储 (轻量级 JSON 文件)
-DATABASE_URL=sqlite:///./dingo_marketing.db
-
-# 应用配置
-CAMPAIGN_MAX_DAILY_POSTS=10
-CAMPAIGN_MIN_INTERVAL_MINUTES=60
-```
-
-## 🔍 故障排除
-
-### 常见问题
-
-1. **端口被占用**
-   ```bash
-   python run.py --port 8001  # 使用其他端口
-   ```
-
-2. **Python 版本过低**
-   ```bash
-   python --version  # 确保 3.10+，推荐 3.12
-   ```
-
-3. **依赖安装失败**
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-4. **API 密钥未配置**
-   - 检查 `.env` 文件中的 `OPENAI_API_KEY` 和 `GITHUB_TOKEN`
-
-5. **CrewAI 版本冲突**
-   ```bash
-   pip install --upgrade pydantic>=2.8.0
-   pip install crewai==0.121.1
-   ```
-
-### 查看详细日志
-
-```bash
-# 启动时查看日志
-python run.py --debug --log-level debug
-
-# 后台运行时查看日志
-tail -f logs/app.log
-```
-
-## 📊 性能指标
-
-- 启动时间: < 5 秒
-- 内存使用: < 200MB
-- API 响应时间: < 2 秒
-- 并发请求: 支持 10+ 并发
-
 ## 🔮 未来计划
 
 - [ ] 支持更多 AI 模型
@@ -253,7 +303,7 @@ tail -f logs/app.log
 
 - [架构设计](docs/ARCHITECTURE.md)
 - [开发指南](docs/DEVELOPMENT.md)
-- [API 文档](http://localhost:8000/docs) (服务启动后)
+- [API 文档](http://localhost:8080/docs) (服务启动后)
 
 ## 📄 许可证
 
@@ -268,7 +318,3 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 3. 提交更改 (`git commit -m 'Add amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
-
----
-
-**快速开始**: `pip install -r requirements.txt && python run.py` 

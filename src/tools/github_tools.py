@@ -4,7 +4,7 @@ GitHub 相关的 AI Agent 工具
 
 import asyncio
 from typing import Dict, List, Any, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from crewai.tools import BaseTool
 from pydantic import BaseModel, Field, model_validator
@@ -75,40 +75,69 @@ class GitHubAnalysisTool(BaseTool):
                 "followers": user.followers,
                 "following": user.following,
                 "public_repos": user.public_repos,
-                "created_at": user.created_at.isoformat(),
+                "created_at": user.created_at.isoformat() if user.created_at else None,
             }
             
             # 分析仓库
-            repos = list(user.get_repos()[:20])  # 限制数量
+            try:
+                repos = list(user.get_repos()[:20])  # 限制数量
+            except Exception as e:
+                logger.warning(f"获取用户仓库失败: {e}")
+                repos = []
+            
             repo_analysis = {
                 "total_repos": len(repos),
-                "total_stars": sum(repo.stargazers_count for repo in repos),
+                "total_stars": sum(repo.stargazers_count for repo in repos if repo.stargazers_count),
                 "languages": {},
                 "topics": [],
             }
             
             # 统计编程语言
             for repo in repos:
-                if repo.language:
-                    repo_analysis["languages"][repo.language] = \
-                        repo_analysis["languages"].get(repo.language, 0) + 1
-                repo_analysis["topics"].extend(repo.get_topics())
+                try:
+                    if repo.language:
+                        repo_analysis["languages"][repo.language] = \
+                            repo_analysis["languages"].get(repo.language, 0) + 1
+                    # 安全获取topics
+                    try:
+                        topics = repo.get_topics()
+                        repo_analysis["topics"].extend(topics)
+                    except Exception:
+                        pass  # 忽略topics获取失败
+                except Exception as e:
+                    logger.warning(f"处理仓库 {repo.name} 失败: {e}")
+                    continue
             
             # 分析最近活动
-            cutoff_date = datetime.now() - timedelta(days=lookback_days)
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=lookback_days)
             recent_events = []
             
-            for event in user.get_events()[:50]:
-                if event.created_at >= cutoff_date:
-                    recent_events.append({
-                        "type": event.type,
-                        "repo": event.repo.name if event.repo else None,
-                        "created_at": event.created_at.isoformat()
-                    })
+            try:
+                for event in user.get_events()[:50]:
+                    try:
+                        # 确保 event.created_at 有时区信息
+                        event_created_at = event.created_at
+                        if event_created_at.tzinfo is None:
+                            event_created_at = event_created_at.replace(tzinfo=timezone.utc)
+                        
+                        if event_created_at >= cutoff_date:
+                            recent_events.append({
+                                "type": event.type,
+                                "repo": event.repo.name if event.repo else None,
+                                "created_at": event.created_at.isoformat() if event.created_at else None
+                            })
+                    except Exception:
+                        continue  # 跳过有问题的事件
+            except Exception as e:
+                logger.warning(f"获取用户事件失败: {e}")
+                recent_events = []
             
             # 计算活跃度分数
             activity_score = min(len(recent_events) * 2, 100)
             influence_score = min((user.followers * 0.1 + repo_analysis["total_stars"] * 0.05), 100)
+            
+            # 安全获取主要编程语言
+            main_languages = list(repo_analysis['languages'].keys())[:3] if repo_analysis['languages'] else ["未知"]
             
             analysis_result = {
                 "user_info": user_info,
@@ -129,12 +158,13 @@ class GitHubAnalysisTool(BaseTool):
             return f"用户 {username} 分析完成:\n" + \
                    f"- 影响力分数: {influence_score:.1f}/100\n" + \
                    f"- 活跃度分数: {activity_score:.1f}/100\n" + \
-                   f"- 主要编程语言: {', '.join(list(repo_analysis['languages'].keys())[:3])}\n" + \
+                   f"- 主要编程语言: {', '.join(main_languages)}\n" + \
                    f"- 总星标数: {repo_analysis['total_stars']}\n" + \
                    f"- 关注者数: {user.followers}\n" + \
                    f"- 推荐策略: {analysis_result['recommendations']}"
             
         except Exception as e:
+            logger.error(f"用户分析失败: {e}")
             return f"用户分析失败: {str(e)}"
     
     def _analyze_repository(self, repository: str, lookback_days: int) -> str:
@@ -166,28 +196,39 @@ class GitHubAnalysisTool(BaseTool):
             }
             
             # 分析最近活动
-            cutoff_date = datetime.now() - timedelta(days=lookback_days)
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=lookback_days)
             recent_issues = []
             recent_prs = []
             
-            for issue in repo.get_issues(state="all", since=cutoff_date)[:20]:
-                recent_issues.append({
-                    "number": issue.number,
-                    "title": issue.title,
-                    "state": issue.state,
-                    "user": issue.user.login,
-                    "created_at": issue.created_at.isoformat()
-                })
-            
-            for pr in repo.get_pulls(state="all")[:10]:
-                if pr.created_at >= cutoff_date:
-                    recent_prs.append({
-                        "number": pr.number,
-                        "title": pr.title,
-                        "state": pr.state,
-                        "user": pr.user.login,
-                        "created_at": pr.created_at.isoformat()
+            try:
+                for issue in repo.get_issues(state="all", since=cutoff_date)[:20]:
+                    recent_issues.append({
+                        "number": issue.number,
+                        "title": issue.title,
+                        "state": issue.state,
+                        "user": issue.user.login,
+                        "created_at": issue.created_at.isoformat()
                     })
+            except Exception as e:
+                logger.warning(f"获取issues失败: {e}")
+            
+            try:
+                for pr in repo.get_pulls(state="all")[:10]:
+                    # 确保 pr.created_at 有时区信息，如果没有则假设为 UTC
+                    pr_created_at = pr.created_at
+                    if pr_created_at.tzinfo is None:
+                        pr_created_at = pr_created_at.replace(tzinfo=timezone.utc)
+                    
+                    if pr_created_at >= cutoff_date:
+                        recent_prs.append({
+                            "number": pr.number,
+                            "title": pr.title,
+                            "state": pr.state,
+                            "user": pr.user.login,
+                            "created_at": pr.created_at.isoformat()
+                        })
+            except Exception as e:
+                logger.warning(f"获取PRs失败: {e}")
             
             # 计算活跃度
             activity_score = min((len(recent_issues) + len(recent_prs)) * 5, 100)
@@ -207,12 +248,25 @@ class GitHubAnalysisTool(BaseTool):
     def _analyze_community(self, lookback_days: int) -> str:
         """分析 Dingo 社区"""
         try:
+            # 检查GITHUB_REPOSITORY配置
+            if not settings.GITHUB_REPOSITORY:
+                return "社区分析失败: 未配置GITHUB_REPOSITORY"
+            
             # 分析 Dingo 仓库
             dingo_repo = self.github.get_repo(settings.GITHUB_REPOSITORY)
             
             # 获取相关用户
-            stargazers = list(dingo_repo.get_stargazers()[:50])
-            contributors = list(dingo_repo.get_contributors()[:20])
+            try:
+                stargazers = list(dingo_repo.get_stargazers()[:50])
+            except Exception as e:
+                logger.warning(f"获取stargazers失败: {e}")
+                stargazers = []
+            
+            try:
+                contributors = list(dingo_repo.get_contributors()[:20])
+            except Exception as e:
+                logger.warning(f"获取contributors失败: {e}")
+                contributors = []
             
             # 分析用户特征
             user_analysis = {
@@ -235,27 +289,30 @@ class GitHubAnalysisTool(BaseTool):
                         comp = user_detail.company
                         user_analysis["user_companies"][comp] = \
                             user_analysis["user_companies"].get(comp, 0) + 1
-                except:
+                except Exception:
                     continue
             
             # 分析最近趋势
-            cutoff_date = datetime.now() - timedelta(days=lookback_days)
+            cutoff_date = datetime.now(timezone.utc) - timedelta(days=lookback_days)
             recent_activity = {
                 "new_stars": 0,
                 "new_issues": 0,
                 "new_prs": 0,
             }
             
-            # 这里可以添加更详细的趋势分析
+            # 安全获取主要地区和公司
+            main_locations = list(user_analysis['user_locations'].keys())[:3] if user_analysis['user_locations'] else ["未知"]
+            main_companies = list(user_analysis['user_companies'].keys())[:3] if user_analysis['user_companies'] else ["未知"]
             
             return f"Dingo 社区分析完成:\n" + \
                    f"- 总星标数: {user_analysis['total_stargazers']}\n" + \
                    f"- 贡献者数: {user_analysis['total_contributors']}\n" + \
-                   f"- 主要地区: {', '.join(list(user_analysis['user_locations'].keys())[:3])}\n" + \
-                   f"- 主要公司: {', '.join(list(user_analysis['user_companies'].keys())[:3])}\n" + \
+                   f"- 主要地区: {', '.join(main_locations)}\n" + \
+                   f"- 主要公司: {', '.join(main_companies)}\n" + \
                    f"- 社区活跃度: 中等"
             
         except Exception as e:
+            logger.error(f"社区分析失败: {e}")
             return f"社区分析失败: {str(e)}"
     
     def _generate_user_recommendations(self, user_info: Dict, repo_analysis: Dict, activity_score: float) -> str:
