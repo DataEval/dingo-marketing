@@ -9,6 +9,8 @@ AI-powered marketing automation platform for GitHub-based projects.
 - **社区互动建议**: 智能推荐最佳互动策略
 - **营销活动自动化**: 自动执行营销任务和跟进
 
+> 💡 **技术架构**: 了解系统的详细技术架构和设计理念，请参考 [架构设计文档](docs/ARCHITECTURE.md)
+
 ## 📋 部署特点
 
 - **本地优先**: 支持简单的本地部署，无需复杂配置
