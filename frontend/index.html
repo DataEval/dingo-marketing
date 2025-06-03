@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dingo Marketing - AI 营销团队</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="logo">🐕</span>
+                <span>Dingo Marketing</span>
+            </div>
+            <div class="nav-links">
+                <a href="#dashboard">仪表板</a>
+                <a href="#analytics">分析</a>
+                <a href="#campaigns">活动</a>
+                <a href="#community">社区</a>
+                <a href="#settings">设置</a>
+                <button class="upgrade-btn">升级</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-title">
+                让 <span class="highlight">AI 营销团队</span><br>
+                为您的技术项目赋能
+            </h1>
+            <p class="hero-subtitle">
+                智能分析 GitHub 用户，生成高质量内容，自动化社区互动，打造完整的技术营销生态系统
+            </p>
+            <div class="action-buttons">
+                <button id="analyzeBtn" class="btn btn-primary">
+                    <span class="btn-icon">🔍</span>
+                    用户分析
+                </button>
+                <button id="generateBtn" class="btn btn-secondary">
+                    <span class="btn-icon">✨</span>
+                    内容生成
+                </button>
+                <button id="communityBtn" class="btn btn-secondary">
+                    <span class="btn-icon">🤝</span>
+                    社区互动
+                </button>
+            </div>
+        </section>
+
+        <!-- 功能卡片 -->
+        <section class="features-grid">
+            <div class="feature-card" data-type="analyze">
+                <div class="card-header">
+                    <h3>🔍 智能用户分析</h3>
+                    <span class="status-badge">运行中</span>
+                </div>
+                <div class="card-content">
+                    <p>深度分析 GitHub 用户的技术背景、社区影响力和互动模式，为精准营销提供数据支撑。</p>
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <div class="stat-number">2.5K</div>
+                            <div class="stat-label">已分析用户</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">95%</div>
+                            <div class="stat-label">准确率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card" data-type="generate">
+                <div class="card-header">
+                    <h3>✨ AI 内容创作</h3>
+                    <span class="status-badge">运行中</span>
+                </div>
+                <div class="card-content">
+                    <p>基于目标受众特征，自动生成博客文章、社交媒体内容和技术文档。</p>
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <div class="stat-number">1.2K</div>
+                            <div class="stat-label">生成内容</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">4.8</div>
+                            <div class="stat-label">平均评分</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card" data-type="community">
+                <div class="card-header">
+                    <h3>🤝 社区管理</h3>
+                    <span class="status-badge">运行中</span>
+                </div>
+                <div class="card-content">
+                    <p>自动化 GitHub 社区互动，包括关注、点赞、评论和问题回复。</p>
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <div class="stat-number">856</div>
+                            <div class="stat-label">互动次数</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">78%</div>
+                            <div class="stat-label">响应率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card" data-type="campaign">
+                <div class="card-header">
+                    <h3>📈 营销活动管理</h3>
+                    <span class="status-badge">运行中</span>
+                </div>
+                <div class="card-content">
+                    <p>端到端营销活动执行，从策略制定到效果评估的完整工作流。</p>
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <div class="stat-number">42</div>
+                            <div class="stat-label">活跃活动</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">3.2x</div>
+                            <div class="stat-label">转化提升</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速开始 -->
+        <section class="quick-start">
+            <h2>🚀 快速开始</h2>
+            <div class="quick-start-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>连接 GitHub</h4>
+                    <p>配置您的 GitHub 访问令牌，开始数据收集和分析</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>配置 AI 模型</h4>
+                    <p>选择合适的 AI 服务提供商，设置 API 密钥</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>开始营销</h4>
+                    <p>创建您的第一个营销活动，让 AI 团队为您工作</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html> 

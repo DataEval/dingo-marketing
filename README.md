@@ -77,6 +77,30 @@ python run.py --host 0.0.0.0 --port 8080
 - API 文档: http://localhost:8080/docs
 - 健康检查: http://localhost:8080/api/v1/status
 
+## 🖥️ Web 界面
+
+为了让非技术用户也能轻松使用 AI 营销功能，我们提供了直观易用的 Web 界面。
+
+### 启动 Web 界面
+
+```bash
+# 方法一：直接打开（推荐）
+cd frontend
+open index.html  # macOS
+start index.html  # Windows
+
+# 方法二：使用 HTTP 服务器
+cd frontend
+python -m http.server 3000
+# 然后访问 http://localhost:3000
+```
+
+### 界面预览
+
+![Dingo Marketing Web界面](docs/assets/demo_GUI.png)
+
+*Web界面提供了直观的操作面板，支持用户分析、内容生成、社区互动等核心功能*
+
 ## 🎯 快速演示
 
 我们提供了一个交互式演示脚本，帮助您快速了解系统的主要功能：
