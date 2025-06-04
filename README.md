@@ -8,6 +8,7 @@ AI-powered marketing automation platform for GitHub-based projects.
 - **自动内容生成**: 使用 AI 生成个性化营销内容
 - **社区互动建议**: 智能推荐最佳互动策略
 - **营销活动自动化**: 自动执行营销任务和跟进
+- **🆕 市场调研**: 实时网络搜索、竞品分析、技术趋势监控、用户反馈分析
 
 > 💡 **技术架构**: 了解系统的详细技术架构和设计理念，请参考 [架构设计文档](docs/ARCHITECTURE.md)
 
@@ -16,6 +17,7 @@ AI-powered marketing automation platform for GitHub-based projects.
 - **本地优先**: 支持简单的本地部署，无需复杂配置
 - **轻量级**: 最小化依赖，快速启动
 - **易于配置**: 简单的环境变量配置
+- **实时数据**: 集成网络搜索，获取最新市场信息
 
 ## 🏃‍♂️ 快速开始
 
@@ -51,9 +53,12 @@ cp .env.example .env
 
 # 编辑 .env 文件，填入必要的 API 密钥
 # 必需配置：
-# - API_KEY: AI服务API密钥（支持DeepSeek、Qwen、OpenAI等）
+# - OPENAI_API_KEY: AI服务API密钥（支持DeepSeek、Qwen、OpenAI等）
 # - GITHUB_TOKEN: GitHub 个人访问令牌
 # - GITHUB_REPOSITORY: 目标GitHub仓库
+
+# 增强功能配置：
+# - SERPER_API_KEY: 网络搜索API密钥 (用于实时市场调研)
 
 # 可选配置：
 # - TWITTER_API_KEY: Twitter API 密钥 (用于社交媒体功能)
@@ -118,6 +123,73 @@ python run.py --debug --reload --log-level debug
 ```
 
 ## 📖 API 使用示例
+
+### 🆕 市场调研
+实时获取市场情报和竞品分析：
+
+```bash
+# 竞品分析
+curl -X POST "http://localhost:8080/api/v1/research/enhanced" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "research_type": "competitor",
+    "target": "Great Expectations",
+    "depth": "medium",
+    "language": "zh"
+  }'
+
+# 技术调研
+curl -X POST "http://localhost:8080/api/v1/research/enhanced" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "research_type": "technology",
+    "target": "数据质量评估",
+    "depth": "deep",
+    "language": "zh"
+  }'
+
+# 市场趋势分析
+curl -X POST "http://localhost:8080/api/v1/research/enhanced" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "research_type": "market_trend",
+    "target": "数据质量工具",
+    "depth": "shallow",
+    "language": "zh"
+  }'
+
+# 用户反馈分析
+curl -X POST "http://localhost:8080/api/v1/research/enhanced" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "research_type": "user_feedback",
+    "target": "Dingo",
+    "depth": "medium",
+    "language": "zh"
+  }'
+```
+
+### 网络搜索和抓取
+直接进行网络搜索和网页抓取：
+
+```bash
+# 网络搜索
+curl -X POST "http://localhost:8080/api/v1/research/web-search" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "数据质量工具 2024 市场趋势",
+    "num_results": 10,
+    "language": "zh"
+  }'
+
+# 网页抓取
+curl -X POST "http://localhost:8080/api/v1/research/web-scrape" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/article",
+    "extract_type": "content"
+  }'
+```
 
 ### 用户分析
 分析GitHub用户的技术背景和社区影响力：
@@ -226,8 +298,8 @@ curl http://localhost:8080/api/v1/tools/status
 ## 💡 使用技巧
 
 ### 1. 选择合适的分析深度
-- `basic`: 快速概览，适合初步了解
-- `standard`: 标准分析，平衡速度和详细程度
+- `shallow`: 快速概览，适合初步了解
+- `medium`: 标准分析，平衡速度和详细程度
 - `deep`: 深度分析，提供最全面的洞察
 
 ### 2. 语言设置
@@ -243,6 +315,12 @@ curl http://localhost:8080/api/v1/tools/status
 - 使用相关的技术关键词
 - 包含项目特定术语
 - 考虑SEO效果
+
+### 5. 🆕 市场调研最佳实践
+- **竞品分析**: 定期监控主要竞争对手的产品更新和市场动态
+- **技术趋势**: 关注相关技术领域的发展趋势和新兴技术
+- **用户反馈**: 收集和分析用户对产品的真实反馈和建议
+- **市场规模**: 了解目标市场的规模和增长潜力
 
 ## 📁 项目结构
 
@@ -273,6 +351,16 @@ dingo-marketing/
 - [x] Web界面 (用户友好的操作界面)
 - [x] API接口 (RESTful API)
 - [x] 多语言支持 (中文/英文)
+- [x] **🆕 市场调研** (实时网络搜索、竞品分析、技术趋势)
+- [x] **🆕 网络数据获取** (网页搜索、内容抓取、数据分析)
+
+### 🆕 市场调研功能
+- [x] **竞品分析** (产品功能对比、定价策略、用户评价)
+- [x] **技术调研** (技术原理、实现方案、性能对比)
+- [x] **市场趋势监控** (行业发展、市场规模、技术趋势)
+- [x] **用户反馈分析** (用户评价、需求挖掘、满意度调研)
+- [x] **实时网络搜索** (Google搜索集成、多语言支持)
+- [x] **网页内容抓取** (智能内容提取、结构化数据)
 
 ### 技术架构
 - [x] 多Agent协作系统 (CrewAI框架)
@@ -280,6 +368,7 @@ dingo-marketing/
 - [x] 配置管理 (环境变量配置)
 - [x] 日志系统 (结构化日志)
 - [x] 错误处理 (优雅的异常处理)
+- [x] **🆕 网络集成** (Serper API、网页抓取)
 
 ### AI模型支持
 - [x] DeepSeek API
@@ -291,6 +380,8 @@ dingo-marketing/
 
 ### 平台集成
 - [x] GitHub (用户分析、社区互动)
+- [x] **🆕 Google搜索** (实时信息获取)
+- [x] **🆕 网页抓取** (内容提取和分析)
 - [ ] Twitter/X (社交媒体营销)
 - [ ] LinkedIn (专业社交网络)
 - [ ] Discord (社区管理)
@@ -301,6 +392,7 @@ dingo-marketing/
 - [x] 社交媒体内容
 - [x] 邮件营销内容
 - [x] 技术文档
+- [x] **🆕 市场调研报告** (竞品分析、趋势报告)
 - [ ] 视频脚本
 - [ ] 播客大纲
 - [ ] 新闻稿
@@ -309,10 +401,13 @@ dingo-marketing/
 - [x] 用户技术栈分析
 - [x] 社区活跃度分析
 - [x] 贡献者识别
+- [x] **🆕 实时竞品分析** (功能对比、市场地位、定价策略)
+- [x] **🆕 技术趋势监控** (技术发展、市场动态)
+- [x] **🆕 用户反馈挖掘** (评价分析、需求识别)
+- [x] **🆕 市场规模评估** (市场容量、增长趋势)
 - [ ] 营销效果分析
 - [ ] A/B测试支持
 - [ ] 数据可视化仪表板
-- [ ] 竞品分析
 
 ### 部署方式
 - [x] 本地部署
@@ -325,6 +420,7 @@ dingo-marketing/
 - [x] 直观的Web界面
 - [x] 实时状态显示
 - [x] 详细的执行报告
+- [x] **🆕 结构化调研报告** (Markdown格式、易于阅读)
 - [ ] 移动端适配
 - [ ] 暗色主题
 - [ ] 多用户支持
@@ -336,6 +432,7 @@ dingo-marketing/
 - [x] 配置管理工具
 - [x] 日志系统
 - [x] 错误处理机制
+- [x] **🆕 API测试工具** (cURL示例、Postman集合)
 - [ ] 单元测试框架
 - [ ] 性能监控工具
 - [ ] 代码质量检查

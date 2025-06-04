@@ -74,7 +74,7 @@ def main():
     
     # 从环境变量或命令行参数获取配置
     host = args.host or os.getenv("HOST", "127.0.0.1")
-    port = args.port or int(os.getenv("PORT", 8000))
+    port = args.port or int(os.getenv("PORT", 8080))
     debug = args.debug or os.getenv("DEBUG", "false").lower() == "true"
     log_level = args.log_level or os.getenv("LOG_LEVEL", "info").lower()
     

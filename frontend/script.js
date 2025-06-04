@@ -22,6 +22,12 @@ function initializeEventListeners() {
     document.getElementById('analyzeBtn').addEventListener('click', () => openModal('analyze'));
     document.getElementById('generateBtn').addEventListener('click', () => openModal('generate'));
     document.getElementById('communityBtn').addEventListener('click', () => openModal('community'));
+    
+    // 新增市场调研按钮
+    const researchBtn = document.getElementById('researchBtn');
+    if (researchBtn) {
+        researchBtn.addEventListener('click', () => openModal('research'));
+    }
 
     // 模态框关闭事件
     document.addEventListener('click', function(e) {
@@ -82,7 +88,13 @@ function openModal(type) {
     `;
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    currentModal = document.querySelector('.modal-overlay');
+    currentModal = document.querySelector('.modal-overlay:last-child');
+    
+    // 显示模态框
+    setTimeout(() => {
+        currentModal.style.opacity = '1';
+        currentModal.style.visibility = 'visible';
+    }, 10);
     
     // 绑定表单提交事件
     const form = currentModal.querySelector('form');
@@ -94,8 +106,12 @@ function openModal(type) {
 // 关闭模态框
 function closeModal() {
     if (currentModal) {
-        currentModal.remove();
-        currentModal = null;
+        currentModal.style.opacity = '0';
+        currentModal.style.visibility = 'hidden';
+        setTimeout(() => {
+            currentModal.remove();
+            currentModal = null;
+        }, 300);
     }
 }
 
@@ -251,6 +267,51 @@ function getModalContent(type) {
                     </button>
                 </form>
             `
+        },
+        research: {
+            title: '📊 市场调研',
+            body: `
+                <form id="researchForm">
+                    <div class="form-group">
+                        <label class="form-label">调研类型</label>
+                        <select class="form-select" name="research_type" required>
+                            <option value="">选择调研类型</option>
+                            <option value="competitor">竞争对手分析</option>
+                            <option value="technology">技术趋势研究</option>
+                            <option value="market">市场趋势分析</option>
+                            <option value="user_feedback">用户反馈分析</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">调研目标</label>
+                        <input type="text" class="form-input" name="target" placeholder="例如: Great Expectations, 数据质量评估" required>
+                        <div class="form-help">输入要调研的具体目标或关键词</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">调研深度</label>
+                        <select class="form-select" name="depth">
+                            <option value="shallow">浅层调研 (快速)</option>
+                            <option value="medium">中等深度</option>
+                            <option value="deep">深度调研 (详细)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">报告语言</label>
+                        <select class="form-select" name="language">
+                            <option value="zh">中文</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">附加要求 (可选)</label>
+                        <textarea class="form-textarea" name="requirements" placeholder="例如: 重点关注开源项目，包含价格对比等"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">🔍</span>
+                        开始调研
+                    </button>
+                </form>
+            `
         }
     };
     
@@ -325,10 +386,11 @@ async function handleFormSubmit(e, type) {
 // API 调用
 async function callAPI(type, data) {
     const endpoints = {
-        analyze: '/analyze/users',
+        analyze: '/github/analyze',
         generate: '/content/generate',
         community: '/community/engage',
-        campaign: '/marketing/comprehensive'
+        campaign: '/marketing/comprehensive',
+        research: '/research/enhanced'
     };
     
     const endpoint = endpoints[type];
@@ -370,7 +432,46 @@ function showResult(result, type) {
     // 格式化结果内容
     let resultContent = '';
     
-    if (result.engagement_result) {
+    if (type === 'research' && result.result) {
+        // 市场调研结果
+        resultContent = `
+            <div class="result-summary">
+                <h4>📊 调研摘要</h4>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="label">调研ID:</span>
+                        <span class="value">${result.research_id || '未知'}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">状态:</span>
+                        <span class="value status-${result.status}">${result.status === 'completed' ? '已完成' : result.status}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">调研类型:</span>
+                        <span class="value">${result.research_type || '未知'}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">目标:</span>
+                        <span class="value">${result.target || '未知'}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="result-details">
+                <h4>📋 调研报告</h4>
+                <div class="research-content">
+                    <pre>${result.result}</pre>
+                </div>
+            </div>
+            ${result.metadata ? `
+                <div class="result-details">
+                    <h4>📊 调研元数据</h4>
+                    <div class="metadata-content">
+                        <pre>${JSON.stringify(result.metadata, null, 2)}</pre>
+                    </div>
+                </div>
+            ` : ''}
+        `;
+    } else if (result.engagement_result) {
         // 社区互动结果 - 优先检查，因为可能同时包含insights字段
         const engagement = result.engagement_result;
         const config = engagement.config || {};

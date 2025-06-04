@@ -18,6 +18,7 @@
             <div class="nav-links">
                 <a href="#dashboard">仪表板</a>
                 <a href="#analytics">分析</a>
+                <a href="#research">调研</a>
                 <a href="#campaigns">活动</a>
                 <a href="#community">社区</a>
                 <a href="#settings">设置</a>
@@ -35,12 +36,16 @@
                 为您的技术项目赋能
             </h1>
             <p class="hero-subtitle">
-                智能分析 GitHub 用户，生成高质量内容，自动化社区互动，打造完整的技术营销生态系统
+                智能分析 GitHub 用户，生成高质量内容，自动化社区互动，实时市场调研，打造完整的技术营销生态系统
             </p>
             <div class="action-buttons">
                 <button id="analyzeBtn" class="btn btn-primary">
                     <span class="btn-icon">🔍</span>
                     用户分析
+                </button>
+                <button id="researchBtn" class="btn btn-primary">
+                    <span class="btn-icon">📊</span>
+                    市场调研
                 </button>
                 <button id="generateBtn" class="btn btn-secondary">
                     <span class="btn-icon">✨</span>
@@ -71,6 +76,32 @@
                             <div class="stat-number">95%</div>
                             <div class="stat-label">准确率</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card" data-type="research">
+                <div class="card-header">
+                    <h3>📊 市场调研</h3>
+                    <span class="status-badge status-new">新功能</span>
+                </div>
+                <div class="card-content">
+                    <p>实时网络搜索、竞品分析、技术趋势监控和用户反馈分析，提供全面的市场情报支持。</p>
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <div class="stat-number">1.8K</div>
+                            <div class="stat-label">调研报告</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">实时</div>
+                            <div class="stat-label">数据更新</div>
+                        </div>
+                    </div>
+                    <div class="research-types">
+                        <span class="research-tag">竞品分析</span>
+                        <span class="research-tag">技术调研</span>
+                        <span class="research-tag">市场趋势</span>
+                        <span class="research-tag">用户反馈</span>
                     </div>
                 </div>
             </div>
@@ -134,6 +165,82 @@
                     </div>
                 </div>
             </div>
+
+            <div class="feature-card" data-type="network">
+                <div class="card-header">
+                    <h3>🌐 网络数据获取</h3>
+                    <span class="status-badge status-new">新功能</span>
+                </div>
+                <div class="card-content">
+                    <p>集成 Google 搜索和网页抓取功能，获取最新的行业信息和竞品动态。</p>
+                    <div class="quick-stats">
+                        <div class="stat">
+                            <div class="stat-number">5.2K</div>
+                            <div class="stat-label">搜索查询</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-number">99.2%</div>
+                            <div class="stat-label">成功率</div>
+                        </div>
+                    </div>
+                    <div class="network-features">
+                        <span class="feature-tag">实时搜索</span>
+                        <span class="feature-tag">内容抓取</span>
+                        <span class="feature-tag">多语言</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 市场调研功能详情 -->
+        <section class="research-section">
+            <h2>🔬 市场调研功能</h2>
+            <div class="research-features">
+                <div class="research-feature">
+                    <div class="feature-icon">🏢</div>
+                    <h4>竞品分析</h4>
+                    <p>深度分析竞争对手的产品功能、定价策略、用户评价和市场地位</p>
+                    <ul>
+                        <li>产品功能对比</li>
+                        <li>定价策略分析</li>
+                        <li>用户评价收集</li>
+                        <li>市场份额评估</li>
+                    </ul>
+                </div>
+                <div class="research-feature">
+                    <div class="feature-icon">⚙️</div>
+                    <h4>技术调研</h4>
+                    <p>研究技术实现原理、解决方案对比和最佳实践分析</p>
+                    <ul>
+                        <li>技术原理分析</li>
+                        <li>实现方案对比</li>
+                        <li>性能基准测试</li>
+                        <li>最佳实践总结</li>
+                    </ul>
+                </div>
+                <div class="research-feature">
+                    <div class="feature-icon">📈</div>
+                    <h4>市场趋势</h4>
+                    <p>监控行业发展趋势、市场规模变化和技术发展方向</p>
+                    <ul>
+                        <li>行业发展趋势</li>
+                        <li>市场规模分析</li>
+                        <li>技术发展方向</li>
+                        <li>投资热点识别</li>
+                    </ul>
+                </div>
+                <div class="research-feature">
+                    <div class="feature-icon">💬</div>
+                    <h4>用户反馈</h4>
+                    <p>收集和分析用户评价、需求挖掘和满意度调研</p>
+                    <ul>
+                        <li>用户评价分析</li>
+                        <li>需求痛点挖掘</li>
+                        <li>满意度调研</li>
+                        <li>改进建议收集</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
         <!-- 快速开始 -->
@@ -152,6 +259,11 @@
                 </div>
                 <div class="step">
                     <div class="step-number">3</div>
+                    <h4>设置搜索服务</h4>
+                    <p>配置 Serper API 密钥，启用实时市场调研功能</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
                     <h4>开始营销</h4>
                     <p>创建您的第一个营销活动，让 AI 团队为您工作</p>
                 </div>

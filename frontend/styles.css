@@ -201,20 +201,35 @@ body {
     font-weight: 500;
 }
 
+.status-badge.status-new {
+    background: #fef3c7;
+    color: #d97706;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
 .card-content p {
     color: #64748b;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .quick-stats {
     display: flex;
-    gap: 2rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
+    flex: 1;
 }
 
 .stat-number {
@@ -228,54 +243,164 @@ body {
     color: #64748b;
 }
 
-/* 快速开始区域 */
-.quick-start {
+/* 研究类型标签 */
+.research-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.research-tag {
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* 网络功能标签 */
+.network-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.feature-tag {
+    background: #f0fdf4;
+    color: #15803d;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* 市场调研功能详情 */
+.research-section {
     background: white;
     border-radius: 12px;
     padding: 2rem;
+    margin-bottom: 3rem;
     border: 1px solid #e2e8f0;
 }
 
-.quick-start h2 {
+.research-section h2 {
     text-align: center;
     margin-bottom: 2rem;
+    color: #1f2937;
     font-size: 2rem;
+    font-weight: 700;
+}
+
+.research-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.research-feature {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.research-feature:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #059669;
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.research-feature h4 {
+    font-size: 1.25rem;
     font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+}
+
+.research-feature p {
+    color: #64748b;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.research-feature ul {
+    list-style: none;
+    text-align: left;
+}
+
+.research-feature li {
+    color: #4b5563;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.research-feature li::before {
+    content: "✓";
+    color: #059669;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* 快速开始 */
+.quick-start {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.quick-start h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
 }
 
 .quick-start-steps {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .step {
     text-align: center;
-    padding: 1rem;
 }
 
 .step-number {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     background: #059669;
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 1.25rem;
     margin: 0 auto 1rem;
 }
 
 .step h4 {
-    margin-bottom: 0.5rem;
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
 .step p {
     color: #64748b;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
 }
 
 /* 模态框样式 */
@@ -290,13 +415,16 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
 }
 
 .modal {
     background: white;
     border-radius: 12px;
     padding: 2rem;
-    max-width: 600px;
+    max-width: 500px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
@@ -328,9 +456,8 @@ body {
     color: #374151;
 }
 
-/* 表单样式 */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .form-label {
@@ -341,19 +468,18 @@ body {
 }
 
 .form-input,
-.form-textarea,
-.form-select {
+.form-select,
+.form-textarea {
     width: 100%;
     padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 1rem;
-    transition: border-color 0.2s;
 }
 
 .form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
+.form-select:focus,
+.form-textarea:focus {
     outline: none;
     border-color: #059669;
     box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
@@ -402,7 +528,7 @@ body {
     }
     
     .nav-links a {
-        display: none;
+        font-size: 0.9rem;
     }
     
     .hero-title {
@@ -428,6 +554,68 @@ body {
     }
     
     .quick-stats {
-        justify-content: center;
+        flex-direction: column;
+        gap: 0.5rem;
     }
+    
+    .research-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .quick-start-steps {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 调研结果样式 */
+.research-content {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.research-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+    color: #374151;
+}
+
+.metadata-content {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.metadata-content pre {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.8rem;
+    color: #475569;
+    margin: 0;
+}
+
+.status-completed {
+    color: #059669 !important;
+    font-weight: 600;
+}
+
+.status-pending {
+    color: #d97706 !important;
+    font-weight: 600;
+}
+
+.status-failed {
+    color: #dc2626 !important;
+    font-weight: 600;
 } 

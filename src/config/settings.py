@@ -31,12 +31,18 @@ class Settings(BaseSettings):
     CAMPAIGN_MAX_DAILY_POSTS: int = 10
     CAMPAIGN_MIN_INTERVAL_MINUTES: int = 60
     
-    # AI 服务配置 - 通用配置
-    API_KEY: str = ""
-    MODEL: str = "deepseek-chat"
-    BASE_URL: str = "https://api.deepseek.com/v1"
+    # AI 服务配置 - 使用 OpenAI 兼容格式
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL_NAME: str = "deepseek-chat"
+    OPENAI_BASE_URL: str = "https://api.deepseek.com/v1"
     MAX_TOKENS: int = 4000
     TEMPERATURE: float = 0.7
+    
+    # Web搜索和抓取配置
+    SERPER_API_KEY: str = ""
+    SCRAPING_USER_AGENT: str = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    SCRAPING_TIMEOUT: int = 30
+    SCRAPING_MAX_RETRIES: int = 3
     
     # GitHub 配置
     GITHUB_TOKEN: str = ""
@@ -58,9 +64,9 @@ class Settings(BaseSettings):
     def get_ai_config(self) -> Dict[str, Any]:
         """获取AI服务配置"""
         return {
-            "model": self.MODEL,
-            "api_key": self.API_KEY,
-            "base_url": self.BASE_URL,
+            "model": self.OPENAI_MODEL_NAME,
+            "api_key": self.OPENAI_API_KEY,
+            "base_url": self.OPENAI_BASE_URL,
             "max_tokens": self.MAX_TOKENS,
             "temperature": self.TEMPERATURE
         }

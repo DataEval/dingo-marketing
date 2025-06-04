@@ -2,6 +2,7 @@
 FastAPI 路由 - 营销自动化 API 接口
 """
 
+import asyncio
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
@@ -84,6 +85,63 @@ class RepositoryConfigRequest(BaseModel):
     repository: str = Field(..., description="GitHub 仓库地址 (格式: owner/repo)")
 
 
+# 新增市场研究请求模型
+class MarketAnalysisRequest(BaseModel):
+    """市场分析请求模型"""
+    product_name: str = Field(..., description="产品名称")
+    product_info: str = Field(..., description="产品信息描述")
+    target_audience: str = Field(..., description="目标用户群体")
+    language: str = Field(default="zh", description="分析报告语言: zh (中文), en (English)")
+
+
+class CompetitorAnalysisRequest(BaseModel):
+    """竞品分析请求模型"""
+    product_name: str = Field(..., description="产品名称")
+    product_info: str = Field(..., description="产品信息描述")
+    competitors: List[str] = Field(..., description="竞争对手列表")
+    language: str = Field(default="zh", description="分析报告语言: zh (中文), en (English)")
+
+
+class UserResearchRequest(BaseModel):
+    """用户研究请求模型"""
+    product_name: str = Field(..., description="产品名称")
+    product_info: str = Field(..., description="产品信息描述")
+    target_audience: str = Field(..., description="目标用户群体")
+    language: str = Field(default="zh", description="研究报告语言: zh (中文), en (English)")
+
+
+class TrendForecastRequest(BaseModel):
+    """趋势预测请求模型"""
+    product_name: str = Field(..., description="产品名称")
+    product_info: str = Field(..., description="产品信息描述")
+    focus_areas: List[str] = Field(..., description="关注领域列表")
+    language: str = Field(default="zh", description="预测报告语言: zh (中文), en (English)")
+
+
+# 新增增强市场调研请求模型
+class EnhancedMarketResearchRequest(BaseModel):
+    """增强市场调研请求模型"""
+    research_type: str = Field(..., description="调研类型: competitor, market_trend, user_feedback, technology")
+    target: str = Field(..., description="调研目标")
+    depth: str = Field(default="medium", description="调研深度: shallow, medium, deep")
+    language: str = Field(default="zh", description="报告语言: zh (中文), en (English)")
+
+
+class WebSearchRequest(BaseModel):
+    """网络搜索请求模型"""
+    query: str = Field(..., description="搜索查询")
+    num_results: int = Field(default=10, description="返回结果数量")
+    language: str = Field(default="zh", description="搜索语言")
+    country: str = Field(default="cn", description="搜索国家")
+
+
+class WebScrapeRequest(BaseModel):
+    """网页抓取请求模型"""
+    url: str = Field(..., description="要抓取的网页URL")
+    extract_type: str = Field(default="text", description="提取类型: text, links, images, structured")
+    max_length: int = Field(default=5000, description="最大内容长度")
+
+
 # 响应模型
 class TaskResponse(BaseModel):
     """任务响应"""
@@ -99,6 +157,30 @@ class AnalysisResponse(BaseModel):
     analyzed_users: List[str]
     insights: Dict[str, Any]
     recommendations: List[str]
+
+
+class CompetitorAnalysisResponse(BaseModel):
+    """竞品分析响应模型"""
+    competitors: List[Dict[str, Any]]
+    market_position: Dict[str, Any]
+    recommendations: List[str]
+
+
+class TrendAnalysisResponse(BaseModel):
+    """趋势分析响应模型"""
+    trends: List[Dict[str, Any]]
+    emerging_technologies: List[str]
+    market_opportunities: List[Dict[str, Any]]
+
+
+class ProductRoadmapResponse(BaseModel):
+    """产品路线图响应模型"""
+    immediate_priorities: List[str]
+    short_term_goals: List[str]
+    medium_term_vision: List[str]
+    long_term_strategy: List[str]
+    competitive_advantages: List[str]
+    market_opportunities: List[Dict[str, Any]]
 
 
 # 创建路由器
@@ -134,6 +216,115 @@ async def get_system_status():
         raise HTTPException(status_code=500, detail=f"系统状态检查失败: {str(e)}")
 
 
+# 新增市场研究 API 端点
+@router.post("/research/market-analysis", response_model=Dict[str, Any])
+async def conduct_market_analysis(
+    request: MarketAnalysisRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """进行市场分析"""
+    try:
+        logger.info(f"开始市场分析: {request.product_name}, 语言: {request.language}")
+        
+        result = await crew.conduct_market_analysis(
+            product_name=request.product_name,
+            product_info=request.product_info,
+            target_audience=request.target_audience,
+            language=request.language
+        )
+        
+        return {
+            "task_id": f"market_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed" if result.get("success") else "failed",
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"市场分析失败: {e}")
+        raise HTTPException(status_code=500, detail=f"市场分析失败: {str(e)}")
+
+
+@router.post("/research/competitor-analysis", response_model=Dict[str, Any])
+async def analyze_competitors(
+    request: CompetitorAnalysisRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """分析竞争对手"""
+    try:
+        logger.info(f"开始竞品分析: {request.competitors}, 语言: {request.language}")
+        
+        result = await crew.analyze_competitors(
+            product_name=request.product_name,
+            product_info=request.product_info,
+            competitors=request.competitors,
+            language=request.language
+        )
+        
+        return {
+            "task_id": f"competitor_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed" if result.get("success") else "failed",
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"竞品分析失败: {e}")
+        raise HTTPException(status_code=500, detail=f"竞品分析失败: {str(e)}")
+
+
+@router.post("/research/user-research", response_model=Dict[str, Any])
+async def research_user_needs(
+    request: UserResearchRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """研究用户需求"""
+    try:
+        logger.info(f"开始用户需求研究: {request.product_name}, 语言: {request.language}")
+        
+        result = await crew.research_user_needs(
+            product_name=request.product_name,
+            product_info=request.product_info,
+            target_audience=request.target_audience,
+            language=request.language
+        )
+        
+        return {
+            "task_id": f"user_research_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed" if result.get("success") else "failed",
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"用户需求研究失败: {e}")
+        raise HTTPException(status_code=500, detail=f"用户需求研究失败: {str(e)}")
+
+
+@router.post("/research/trend-forecast", response_model=Dict[str, Any])
+async def forecast_trends(
+    request: TrendForecastRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """预测趋势"""
+    try:
+        logger.info(f"开始趋势预测: {request.focus_areas}, 语言: {request.language}")
+        
+        result = await crew.forecast_trends(
+            product_name=request.product_name,
+            product_info=request.product_info,
+            focus_areas=request.focus_areas,
+            language=request.language
+        )
+        
+        return {
+            "task_id": f"trend_forecast_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed" if result.get("success") else "failed",
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"趋势预测失败: {e}")
+        raise HTTPException(status_code=500, detail=f"趋势预测失败: {str(e)}")
+
+
 @router.post("/analyze/users", response_model=Dict[str, Any])
 async def analyze_users(
     request: UserAnalysisRequest,
@@ -166,7 +357,6 @@ async def analyze_users(
                 "针对不同技术背景的用户调整内容策略" if request.language == "zh" else "Adjust content strategies for users with different technical backgrounds"
             ]
         }
-        
     except Exception as e:
         logger.error(f"用户分析失败: {e}")
         raise HTTPException(status_code=500, detail=f"用户分析失败: {str(e)}")
@@ -601,4 +791,188 @@ async def set_target_repository(
         raise
     except Exception as e:
         logger.error(f"设置目标仓库失败: {e}")
-        raise HTTPException(status_code=500, detail=f"设置目标仓库失败: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"设置目标仓库失败: {str(e)}")
+
+
+@router.post("/api/v1/market/comprehensive")
+async def comprehensive_market_analysis(
+    request: MarketAnalysisRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """
+    综合市场分析
+    """
+    try:
+        logger.info(f"开始综合市场分析: {request.product_name}, 语言: {request.language}")
+        
+        # 并行执行多个分析任务
+        market_task = crew.conduct_market_analysis(
+            product_name=request.product_name,
+            product_info=request.product_info,
+            target_audience=request.target_audience,
+            language=request.language
+        )
+        
+        # 如果有竞争对手信息，也进行竞品分析
+        # 这里可以根据实际需求扩展
+        
+        # 等待市场分析完成
+        market_result = await market_task
+        
+        # 生成综合报告
+        report = {
+            "executive_summary": {
+                "product_name": request.product_name,
+                "analysis_date": datetime.now().isoformat(),
+                "analysis_language": request.language,
+                "status": "completed" if market_result.get("success") else "failed"
+            },
+            "market_analysis": market_result,
+            "actionable_recommendations": [
+                {
+                    "category": "市场定位" if request.language == "zh" else "Market Positioning",
+                    "priority": "高" if request.language == "zh" else "High",
+                    "action": "基于市场分析，明确产品定位" if request.language == "zh" else "Define product positioning based on market analysis",
+                    "timeline": "立即执行" if request.language == "zh" else "Immediate"
+                },
+                {
+                    "category": "产品开发" if request.language == "zh" else "Product Development",
+                    "priority": "高" if request.language == "zh" else "High", 
+                    "action": "优先开发用户最需要的功能" if request.language == "zh" else "Prioritize development of most needed features",
+                    "timeline": "3个月内" if request.language == "zh" else "Within 3 months"
+                },
+                {
+                    "category": "市场推广" if request.language == "zh" else "Marketing",
+                    "priority": "中" if request.language == "zh" else "Medium",
+                    "action": "制定针对性的内容策略" if request.language == "zh" else "Develop targeted content strategy",
+                    "timeline": "持续进行" if request.language == "zh" else "Ongoing"
+                }
+            ]
+        }
+        
+        return report
+        
+    except Exception as e:
+        logger.error(f"综合市场分析失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"综合市场分析失败: {str(e)}")
+
+
+# 新增增强市场调研API端点
+@router.post("/research/enhanced", response_model=Dict[str, Any])
+async def enhanced_market_research(
+    request: EnhancedMarketResearchRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """
+    增强市场调研 - 使用网络搜索和网页抓取
+    """
+    try:
+        logger.info(f"开始增强市场调研: {request.research_type} - {request.target}")
+        
+        # 使用增强市场调研工具
+        from src.tools.research_tools import EnhancedMarketResearchTool
+        research_tool = EnhancedMarketResearchTool()
+        
+        result = research_tool._run(
+            research_type=request.research_type,
+            target=request.target,
+            depth=request.depth,
+            language=request.language
+        )
+        
+        return {
+            "research_id": f"enhanced_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed",
+            "research_type": request.research_type,
+            "target": request.target,
+            "depth": request.depth,
+            "language": request.language,
+            "result": result,
+            "metadata": {
+                "tools_used": ["web_search", "web_scrape", "enhanced_market_research"],
+                "research_date": datetime.now().isoformat(),
+                "data_sources": ["Google Search", "Web Scraping", "AI Analysis"]
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"增强市场调研失败: {e}")
+        raise HTTPException(status_code=500, detail=f"增强市场调研失败: {str(e)}")
+
+
+@router.post("/tools/web-search", response_model=Dict[str, Any])
+async def web_search(
+    request: WebSearchRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """
+    网络搜索工具
+    """
+    try:
+        logger.info(f"执行网络搜索: {request.query}")
+        
+        from src.tools.research_tools import WebSearchTool
+        search_tool = WebSearchTool()
+        
+        result = search_tool._run(
+            query=request.query,
+            num_results=request.num_results,
+            language=request.language,
+            country=request.country
+        )
+        
+        return {
+            "search_id": f"search_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed",
+            "query": request.query,
+            "num_results": request.num_results,
+            "language": request.language,
+            "country": request.country,
+            "result": result,
+            "metadata": {
+                "search_date": datetime.now().isoformat(),
+                "data_source": "Serper API"
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"网络搜索失败: {e}")
+        raise HTTPException(status_code=500, detail=f"网络搜索失败: {str(e)}")
+
+
+@router.post("/tools/web-scrape", response_model=Dict[str, Any])
+async def web_scrape(
+    request: WebScrapeRequest,
+    crew: MarketingCrew = Depends(get_marketing_crew)
+):
+    """
+    网页抓取工具
+    """
+    try:
+        logger.info(f"执行网页抓取: {request.url}")
+        
+        from src.tools.research_tools import WebScrapeTool
+        scrape_tool = WebScrapeTool()
+        
+        result = scrape_tool._run(
+            url=request.url,
+            extract_type=request.extract_type,
+            max_length=request.max_length
+        )
+        
+        return {
+            "scrape_id": f"scrape_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed",
+            "url": request.url,
+            "extract_type": request.extract_type,
+            "max_length": request.max_length,
+            "result": result,
+            "metadata": {
+                "scrape_date": datetime.now().isoformat(),
+                "content_length": len(result)
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"网页抓取失败: {e}")
+        raise HTTPException(status_code=500, detail=f"网页抓取失败: {str(e)}") 

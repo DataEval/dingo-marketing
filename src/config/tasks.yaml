@@ -1,0 +1,146 @@
+# CrewAI Tasks Configuration
+
+# 市场研究任务
+market_analysis_task:
+  description: >
+    对 {product_name} 的目标市场进行深度分析。
+    
+    分析内容包括：
+    1. 市场规模和增长趋势
+    2. 目标用户群体特征
+    3. 市场机会和挑战
+    4. 关键成功因素
+    
+    请使用 {language} 语言进行分析和报告。
+    
+    产品信息：{product_info}
+    目标用户：{target_audience}
+  expected_output: >
+    一份详细的市场分析报告，包含市场规模、用户画像、机会分析和建议。
+
+competitor_analysis_task:
+  description: >
+    对 {product_name} 的主要竞争对手进行深度分析。
+    
+    分析内容包括：
+    1. 主要竞品识别和分类
+    2. 功能对比分析
+    3. 技术架构对比
+    4. 商业模式分析
+    5. 优劣势对比
+    6. 差异化机会识别
+    
+    请使用 {language} 语言进行分析和报告。
+    
+    产品信息：{product_info}
+    竞品列表：{competitors}
+  expected_output: >
+    一份全面的竞品分析报告，包含功能对比、技术分析和差异化建议。
+
+user_research_task:
+  description: >
+    深入研究 {product_name} 的目标用户需求和痛点。
+    
+    研究内容包括：
+    1. 用户角色定义
+    2. 使用场景分析
+    3. 痛点和需求识别
+    4. 用户反馈分析
+    5. 改进建议
+    
+    请使用 {language} 语言进行研究和报告。
+    
+    产品信息：{product_info}
+    目标用户：{target_audience}
+  expected_output: >
+    一份详细的用户研究报告，包含用户画像、需求分析和产品建议。
+
+trend_analysis_task:
+  description: >
+    分析 {product_name} 相关领域的技术趋势和市场发展方向。
+    
+    分析内容包括：
+    1. 技术发展趋势
+    2. 市场需求变化
+    3. 新兴机会识别
+    4. 风险和挑战
+    5. 未来发展预测
+    
+    请使用 {language} 语言进行分析和报告。
+    
+    产品信息：{product_info}
+    关注领域：{focus_areas}
+  expected_output: >
+    一份前瞻性的趋势分析报告，包含技术预测、市场机会和战略建议。
+
+# 营销任务
+analyze_target_users_task:
+  description: >
+    分析 GitHub 上 {repo_name} 项目的目标用户群体。
+    
+    分析内容包括：
+    1. 当前用户画像
+    2. 潜在用户识别
+    3. 用户行为分析
+    4. 社区参与度评估
+    
+    请使用 {language} 语言进行分析和报告。
+    
+    GitHub 仓库：{repo_url}
+    产品信息：{product_info}
+  expected_output: >
+    一份详细的目标用户分析报告，包含用户画像、行为分析和增长建议。
+
+create_content_campaign_task:
+  description: >
+    为 {repo_name} 项目创建内容营销活动。
+    
+    创建内容包括：
+    1. 技术博客文章
+    2. 教程和指南
+    3. 社交媒体内容
+    4. 社区互动内容
+    
+    请使用 {language} 语言创建内容。
+    
+    目标用户：{target_audience}
+    产品特点：{product_features}
+    营销目标：{marketing_goals}
+  expected_output: >
+    一套完整的内容营销方案，包含各类型内容和发布计划。
+
+community_engagement_task:
+  description: >
+    制定 {repo_name} 项目的社区参与策略。
+    
+    策略内容包括：
+    1. 社区互动计划
+    2. 用户关系管理
+    3. 反馈收集机制
+    4. 社区活动规划
+    
+    请使用 {language} 语言制定策略。
+    
+    当前社区状态：{community_status}
+    参与目标：{engagement_goals}
+  expected_output: >
+    一份全面的社区参与策略，包含具体行动计划和成功指标。
+
+comprehensive_marketing_campaign_task:
+  description: >
+    为 {repo_name} 项目制定综合营销活动。
+    
+    活动内容包括：
+    1. 整体营销策略
+    2. 多渠道推广计划
+    3. 内容营销策略
+    4. 社区建设计划
+    5. 效果评估机制
+    
+    请使用 {language} 语言制定活动方案，并在委派任务给团队成员时明确指定所需的语言。
+    
+    产品信息：{product_info}
+    营销目标：{marketing_goals}
+    目标用户：{target_audience}
+  expected_output: >
+    一份完整的营销活动方案，包含策略、计划、执行步骤和评估标准。 
