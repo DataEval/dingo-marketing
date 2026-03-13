@@ -1,0 +1,27 @@
+# Project configuration template
+# Copy this file and rename to <project-name>.yaml
+
+name: "Your Project Name"
+tagline: "One-line project description"
+repo: "https://github.com/org/project"
+# saas_url: "https://..."        # optional: hosted platform URL
+install_command: "pip install your-project"
+# pypi_url: ""                   # optional
+language: "python"               # python, typescript, rust, go, etc.
+license: "MIT"
+stars: "100+"
+
+highlights:
+  - "Key selling point 1"
+  - "Key selling point 2"
+  - "Key selling point 3"
+
+platforms:
+  reddit:
+    subreddits: ["relevant_subreddit"]
+  twitter:
+    hashtags: ["#tag1", "#tag2"]
+  xiaohongshu:
+    tags: ["标签1", "标签2"]
+  hacker_news:
+    prefix: "Show HN"

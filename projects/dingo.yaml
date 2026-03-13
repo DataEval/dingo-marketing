@@ -1,0 +1,27 @@
+name: Dingo
+tagline: "AI Data Quality Evaluation Framework"
+repo: https://github.com/MigoXLab/dingo
+saas_url: https://dingo.openxlab.org.cn/
+install_command: "pip install dingo-python"
+pypi_url: https://pypi.org/project/dingo-python/
+language: python
+license: Apache-2.0
+stars: "650+"
+
+highlights:
+  - "70+ built-in evaluation metrics"
+  - "4-layer evaluation architecture: Rule, LLM, VLM, Agent"
+  - "RAG evaluation (faithfulness, context precision, recall, relevancy)"
+  - "OCR / document parsing quality evaluation"
+  - "MCP protocol integration (Claude Desktop, Cursor)"
+  - "SaaS platform with web UI and API key access"
+
+platforms:
+  reddit:
+    subreddits: ["MachineLearning", "LocalLLaMA"]
+  twitter:
+    hashtags: ["#AI", "#DataQuality", "#OpenSource", "#LLM", "#RAG"]
+  xiaohongshu:
+    tags: ["AI", "数据质量", "开源", "大模型", "RAG"]
+  hacker_news:
+    prefix: "Show HN"
